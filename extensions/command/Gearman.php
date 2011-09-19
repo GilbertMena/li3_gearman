@@ -8,6 +8,7 @@
  
 namespace li3_gearman\extensions\command;
 
+use li3_gearman\extensions\service\gearman\Client;
 use li3_gearman\extensions\service\gearman\Worker;
 
 /**
@@ -15,12 +16,21 @@ use li3_gearman\extensions\service\gearman\Worker;
  * executing longer tasks in the background.
  */
 class Gearman extends \lithium\console\Command {
-  /**
-   * Start a gearman worker.
-   *
-   * @param $quiet          bool
-   */
+	/**
+	 * Start a gearman worker.
+	 *
+	 * @param $quiet          bool
+	 */
 	public function work($quiet = false) {
 		Worker::work();
+	}
+	
+	/**
+	 * Queues a job
+	 *
+	 * @param $job			string
+	 */
+	public function queue($job) {
+		Client::queue($job);
 	}
 }

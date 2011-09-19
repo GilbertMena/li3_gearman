@@ -9,8 +9,12 @@ class Worker extends \lithium\core\StaticObject {
 		$worker = new \GearmanWorker();
 		
 		$config = Gearman::config();
-		
 		$worker->addServer($config['host'], $config['port']);
+		
+		$jobs = \lithium\core\Libraries::locate('job');
+		foreach($jobs as $job) {
+			$worker->addFunction($job::name(), array($job, 'execute'));
+		}
 		
 		while ($worker->work()) {
 			if($worker->returnCode() != GEARMAN_SUCCESS) {

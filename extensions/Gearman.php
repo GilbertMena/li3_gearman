@@ -32,44 +32,21 @@ class Gearman extends \lithium\core\StaticObject {
 	 */
 	public static function config($config = null) {
 		if ($config && is_array($config)) {
-			static::$_configurations = $config;
+			static::$_configurations = $config + static::$_defaults;
 			return;
 		}
-		if ($config) {
-			return static::_config($config);
-		}
-		$result = array();
-		static::$_configurations = array_filter(static::$_configurations);
-
-		foreach (array_keys(static::$_configurations) as $key) {
-			$result[$key] = static::_config($key);
-		}
-		return $result;
+		
+		return static::$_configurations + static::$_defaults;
 	}
 	
-	/**
-	 * Gets an array of settings for the given named configuration in the current
-	 * environment.
-	 *
-	 * @see lithium\core\Environment
-	 * @param string $name Named configuration.
-	 * @return array Settings for the named configuration.
-	 */
-	protected static function _config($name) {
-		if (!isset(static::$_configurations[$name])) {
-			return null;
+	public static function paths($path = null) {
+		if (empty($path)) {
+			return static::$_paths;
 		}
-		$settings = static::$_configurations[$name];
-
-
-		$env = Environment::get();
-		$config = isset($settings[$env]) ? $settings[$env] : $settings;
-
-		if (isset($settings[$env]) && isset($settings[true])) {
-			$config += $settings[true];
+		if (is_string($path)) {
+			return isset(static::$_paths[$path]) ? static::$_paths[$path] : null;
 		}
-		static::$_configurations[$name] += array($config + static::$_defaults);
-		return static::$_configurations[$name][0];
+		static::$_paths = array_filter(array_merge(static::$_paths, (array) $path));
 	}
 }
 
