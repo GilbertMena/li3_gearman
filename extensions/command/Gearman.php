@@ -28,9 +28,21 @@ class Gearman extends \lithium\console\Command {
 	/**
 	 * Queues a job
 	 *
-	 * @param $job			string
+	 * @param string $job The name of the job
+	 * @param string $payload JSON Serialized string of the workload 
 	 */
-	public function queue($job) {
-		Client::queue($job);
+	public function queue($job, $payload = '') {
+		$workload = array();
+		
+		if($payload) {
+			$workload = json_decode($payload, true);
+			
+			if(json_last_error() != JSON_ERROR_NONE) {
+				echo 'Job not queued. There was an error with your payload'.PHP_EOL;
+				exit();
+			}
+		}
+		
+		Client::queue($job, $workload);
 	}
 }
