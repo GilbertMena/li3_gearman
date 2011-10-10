@@ -25,10 +25,12 @@ The plugin has default configurations, but you can change these if you wish like
 		'port' => '4730',	
 	));
 
-## Usage
+## Basic Usage
 
-Create a job in `/app/extensions/job` that extends `\li3_gearman\extensions\service\gearman\Job`.
+Create a job at `/app/extensions/job/HelloWorld.php` that extends `\li3_gearman\extensions\service\gearman\Job`.
 
+	namespace app\extensions\job;
+	
 	class HelloWorld extends \li3_gearman\extensions\service\gearman\Job {
 		protected function _work() {
 			echo 'Hello World!';
@@ -46,3 +48,26 @@ You can manually queue jobs via the console
 Or you can queue jobs in your application
 
 	\li3_gearman\extensions\service\gearman\Client::queue('HelloWorld');
+	
+## Workload Usage
+
+If you have the job `/app/extensions/job/Hello.php`:
+
+	namespace app\extensions\job;
+
+	class Hello extends \li3_gearman\extensions\service\gearman\Job {
+	    protected function _work() {
+	    	$workload = $this->getWorkLoad();
+	    	
+	    	$subject = $workload->subject ?: 'World';
+	        echo 'Hello '.$subject.'!'.PHP_EOL;
+	    }
+	}
+
+Can you manually queue the job with a payload like so:
+
+	li3 gearman queue Hello '{"subject":"Lithium"}'
+	
+Or in your application
+
+	\li3_gearman\extensions\service\gearman\Client::queue('Hello', array('subject' => 'Lithium'));
