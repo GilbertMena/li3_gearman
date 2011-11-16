@@ -3,7 +3,7 @@
 namespace li3_gearman\extensions\service\gearman;
 
 use li3_gearman\extensions\Gearman;
-use lithium\data\Connection;
+use lithium\data\Connections;
 
 class Client extends \lithium\core\StaticObject {
 	/**
@@ -15,7 +15,7 @@ class Client extends \lithium\core\StaticObject {
 	protected static function _init() {
 		self::$_instance = new \GearmanClient();
 		
-		$gearman = Connection::get('gearman');
+		$gearman = Connections::get('gearman');
 		$config = Gearman::config();
 		self::$_instance->addServer($config['host'], $config['port']);
 	}
