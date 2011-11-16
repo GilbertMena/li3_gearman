@@ -3,11 +3,13 @@
 namespace li3_gearman\extensions\service\gearman;
 
 use li3_gearman\extensions\Gearman;
+use lithium\data\Connection;
 
 class Worker extends \lithium\core\StaticObject {
 	public static function work() {
 		$worker = new \GearmanWorker();
 		
+		$gearman = Connection::get('gearman');
 		$config = Gearman::config();
 		$worker->addServer($config['host'], $config['port']);
 		
