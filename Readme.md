@@ -175,3 +175,34 @@ If you don't want this archiving functionality when the row is deleted from the 
 
 `DROP TRIGGER archive_gearman_jobs;`
 
+#### Usage
+
+####### Start the worker
+Call `li3 gearman work` in your lithium app directory which will create the worker.
+
+####### Enter an object into table for processing
+<pre>
+//assuming a class called HelloWorld
+$job = 'HelloWorld';
+
+//the priority for the gearman job.  Support still missing
+$priority = 0;
+
+//there is no support for this yet.
+$runAt = null;
+
+//the full qualified name for the class
+$className = '\\li3_gearman\\tests\\mocks\\data\\job\\'.$job;
+
+//instantiate the object that you wish to store, make sure that the object has a perform method
+$job = new $className($testID);
+
+//store the object in the table
+Jobs::enqueue($job, $priority, $runAt);
+
+</pre>
+
+This should call the user define function for gearman thanks to the trigger we created when setting up our tables.
+If MySQL UDF, the Gearman Job Server and the Gearman workers are running, everything should work.
+
+
