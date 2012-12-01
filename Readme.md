@@ -72,7 +72,7 @@ Or in your application
 
 	\li3_gearman\extensions\service\gearman\Client::queue('Hello', array('subject' => 'Lithium'));
         
-## MySQL UDF Usage
+## MySQL Gearman UDF Usage
 
 Install MySQL UDF
 
