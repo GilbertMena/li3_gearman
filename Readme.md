@@ -13,7 +13,7 @@ Include the library in in your `/app/config/bootstrap/libraries.php`
     
 Install gearman and the pear gearman packages
 
-	apt-get install gearman php-pear
+	sudo apt-get install gearman php-pear
 	pear install gearman-0.8.0
     
 ## Configuration
@@ -211,5 +211,6 @@ Jobs::enqueue($job, $priority, $runAt);
 
 This should call the user defined function for Gearman thanks to the trigger we created when setting up our tables.
 If MySQL UDF, the Gearman Job Server and the Gearman workers are running, everything should work.
+
 
 
