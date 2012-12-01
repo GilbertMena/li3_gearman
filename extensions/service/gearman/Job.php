@@ -34,6 +34,15 @@ abstract class Job extends \lithium\core\Object {
 	}
 	
 	public function getWorkLoad() {
+		//take our serialized string and remove the id prepended by our mysql trigger
+		if(preg_match('/(?P<id>\d+)\|\|\|(?P<object>.*)/',$this->order->workload(),$matches))
+		{
+			$id = $matches['id'];
+			$object = unserialize($matches['object']);
+			$object->id = $id;
+			return $object;
+		}
+		//our default action for other methods
 		return json_decode($this->order->workload());
 	}
 	
