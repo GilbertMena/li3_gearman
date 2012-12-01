@@ -76,7 +76,7 @@ Or in your application
 
 Install MySQL UDF
 
-Create MySQL TABLE called `delayed_jobs`
+Create MySQL TABLES and TRIGGERS
 
 <pre>
 
@@ -119,6 +119,7 @@ CREATE TABLE IF NOT EXISTS `delayed_jobs` (
 -- Triggers `delayed_jobs`
 --
 DROP TRIGGER IF EXISTS `add_to_gearman`;
+DROP TRIGGER IF EXISTS `archive_gearman_jobs`;
 DELIMITER //
 CREATE TRIGGER `add_to_gearman` AFTER INSERT ON `delayed_jobs`
  FOR EACH ROW BEGIN
@@ -160,27 +161,33 @@ class Process extends \li3_gearman\extensions\service\gearman\Job {
 
 </pre>
 
-The way we add things to the queue with MySQl UDF is different than the examples above (Client, etc).
+The way we add things to the queue with MySQL UDF is different than the examples above (Client, etc).
 We add a serialized object that has a perform method with the logic that needs to be executed when the Gearman worker is called.  In other words,
 instead of creating many different workers with different logic, we create a single worker whose job is to receive a serialized object
 from a MySQL table that contains the object's state and logic.  This enables us to create objects dynamically, store them in MySQL and leverage
 MySQL's triggers to begin the Gearman process without having to query the database until completion (either successful or failed completion).
 
 The idea here is to have permanent storage of your queue that doesn't dissapear after completion (unless you want it to).  By default, the data
-is deleted from the `delayed_jobs` table and moved to a archiving table that happens to look exactly like the `delayed_jobs` table but without
+is deleted from the `delayed_jobs` table and moved to an archiving table that happens to look exactly like the `delayed_jobs` table but without
 any triggers.  This archive table can be used for auditing or "replaying" events back into the queue.  The reason we move the objects is to keep
 our `delayed_jobs` table lean and mean.
 
 If you don't want this archiving functionality when the row is deleted from the `delayed_jobs` table, run the following:
 
-`DROP TRIGGER archive_gearman_jobs;`
+`DROP TRIGGER IF EXISTS archive_gearman_jobs;`
 
 #### Usage
 
-####### Start the worker
+###### Start the worker
 Call `li3 gearman work` in your lithium app directory which will create the worker.
 
-####### Enter an object into table for processing
+###### Enter an object into table for processing
+Enter at the beginning of the file where you want store something in the MySQL UDF queue
+
+`use li3_gearman\models\Jobs; `
+
+In the same file, where you want to queue an object:
+
 <pre>
 //assuming a class called HelloWorld
 $job = 'HelloWorld';
@@ -202,7 +209,7 @@ Jobs::enqueue($job, $priority, $runAt);
 
 </pre>
 
-This should call the user define function for gearman thanks to the trigger we created when setting up our tables.
+This should call the user defined function for Gearman thanks to the trigger we created when setting up our tables.
 If MySQL UDF, the Gearman Job Server and the Gearman workers are running, everything should work.
 
 
