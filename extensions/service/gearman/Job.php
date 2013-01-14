@@ -22,8 +22,18 @@ abstract class Job extends \lithium\core\Object {
 			$class = get_called_class();
 			$job = new $class();
 			$job->order($order);
-			if($job->work()) {
-				$order->sendComplete();
+			$result = $job->work();
+			if($result) {
+				if(is_object($result))
+				{
+					$className = get_class($result);
+					$className = str_replace('\\','/',$className);
+					$response = array('className'=>LITHIUM_APP_PATH.substr($className,3),'object'=>serialize($result));
+					$order->sendComplete(serialize($response));
+				}else
+				{
+					$order->sendComplete(json_encode($response));
+				}
 			} else {
 				throw new \Exception('Order not completed');
 			}
@@ -68,8 +78,9 @@ abstract class Job extends \lithium\core\Object {
 	
 	public final function work() {
 		$this->_init();
-		$this->_work();
+		$workResult = $this->_work();
 		$this->_shutdown();
+		return $workResult;
 	}
 	
 	/**
