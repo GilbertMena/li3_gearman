@@ -80,8 +80,12 @@ class Jobs extends \lithium\data\Model {
     $this->workerName = 'host:'.gethostname().' pid:'.getmypid();
   }
   
-  public function setDataSourceType()
+  public function setDataSourceType($table = null)
   {
+    if(!empty($table))
+    {
+      $this->_meta['source'] = $table;
+    }
     $config = Connections::get($this->_meta['connection'], array('config' => true));
     
     if($config['type']=='database')
@@ -126,7 +130,7 @@ class Jobs extends \lithium\data\Model {
    * @return bool
    * @throws ErrorException
    */
-  public static function enqueue($object, $priority = 0, $runAt = null) {
+  public static function enqueue($object, $priority = 0, $runAt = null, $table = null) {
     
     $data = array(
       'attempts' => 0, 
@@ -147,7 +151,7 @@ class Jobs extends \lithium\data\Model {
     //set the datasourcetype if not already set
     if(empty(self::$dataSourceType))
     {
-      $job->setDataSourceType();
+      $job->setDataSourceType($table);
     }
     
     if(!method_exists($object, 'perform')) {
@@ -186,13 +190,13 @@ class Jobs extends \lithium\data\Model {
    *
    * @return bool|\lithium\data\entity\Document
    */
-  public static function findJob($id, $maxRunTime = self::MAX_RUN_TIME)
+  public static function findJob($id, $maxRunTime = self::MAX_RUN_TIME, $table = null)
   {
     
     //set the datasourcetype if not already set
     if(empty(self::$dataSourceType))
     {
-      self::setDataSourceType();
+      self::setDataSourceType($table);
     }
     
     
@@ -209,12 +213,12 @@ class Jobs extends \lithium\data\Model {
   /**
    * @param $message string
    */
-  public static function reschedule($message,$id) {
+  public static function reschedule($message,$id,$table=null) {
     
     //set the datasourcetype if not already set
     if(empty(self::$dataSourceType))
     {
-      self::setDataSourceType();
+      self::setDataSourceType($table);
     }
 
     $idKey = self::$keyID;
