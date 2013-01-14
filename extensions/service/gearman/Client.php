@@ -27,4 +27,12 @@ class Client extends \lithium\core\StaticObject {
 		
 		self::$_instance->doBackground($job, json_encode($workload));
 	}
+	
+	public static function process($job, array $workload = array()) {
+		if(!self::$_instance) {
+			self::_init();
+		}
+		
+		return self::$_instance->doNormal($job, json_encode($workload));
+	}
 }
