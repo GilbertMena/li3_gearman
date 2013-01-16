@@ -23,6 +23,7 @@ abstract class Job extends \lithium\core\Object {
 			$job = new $class();
 			$job->order($order);
 			$result = $job->work();
+			//var_dump($result);
 			if($result) {
 				if(is_object($result))
 				{
@@ -32,7 +33,7 @@ abstract class Job extends \lithium\core\Object {
 					$order->sendComplete(serialize($response));
 				}else
 				{
-					$order->sendComplete(json_encode($response));
+					$order->sendComplete(json_encode($result));
 				}
 			} else {
 				throw new \Exception('Order not completed');
