@@ -247,7 +247,7 @@ class Jobs extends \lithium\data\Model {
    * @return int
    */
   public static function reserveAndRunOneJob($job,$maxRunTime = self::MAX_RUN_TIME) {
-      $t = Jobs::runWithLock($job,$maxRunTime);
+      $t = static::runWithLock($job,$maxRunTime);
       if(!is_null($t)) {
         return $t;
       }
@@ -272,7 +272,7 @@ class Jobs extends \lithium\data\Model {
         $complete = Jobs::update(array('completed_at' => $time_now), array($idKey => $job->id));
       }else
       {
-        Jobs::remove(array($idKey => $job->id));
+        static::remove(array($idKey => $job->id));
       }
       
       
@@ -282,8 +282,8 @@ class Jobs extends \lithium\data\Model {
       Logger::info(sprintf('* [JOB] '.$job->id.' completed after %.4f', $runtime));
       return true;
     } catch(Exception $e) {
-      Jobs::reschedule($e->getMessage(),$id);
-      Jobs::logException($e);
+      static::reschedule($e->getMessage(),$id);
+      static::logException($e);
       return false;
     }
   }
@@ -299,7 +299,7 @@ class Jobs extends \lithium\data\Model {
     $success = $failure = 0;
     
     
-      $result = self::reserveAndRunOneJob($job);
+      $result = static::reserveAndRunOneJob($job);
       
       if($result === true) {
         $success++;
