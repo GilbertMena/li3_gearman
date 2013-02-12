@@ -55,15 +55,15 @@ class Queue extends \li3_gearman\models\Jobs {
   {
 	if(empty($id))
 	{
-		echo 'processing all non task created records...'."\r\n";
+		//echo 'processing all non task created records...'."\r\n";
 		$results = Queue::all(array('conditions'=>array('task_list_created'=>false)));
 		if(empty($results))
 		{
-			echo 'nothing found'."\r\n";
+			//echo 'nothing found'."\r\n";
 			return;
 		}
 		$results = $results->to('array');
-		echo 'About to re-process '.count($results).' objects'."\r\n";
+		//echo 'About to re-process '.count($results).' objects'."\r\n";
 		foreach($results as $key => $result)
 		{
 			$tempResult = $result;
@@ -75,11 +75,11 @@ class Queue extends \li3_gearman\models\Jobs {
 		return;
 	}else
 	{
-		echo 'about to process queue id: '.$id."\r\n";
+		//echo 'about to process queue id: '.$id."\r\n";
 		$results = Queue::first(array('conditions'=>array('id'=>$id)));
 		if(empty($results))
 		{
-			echo 'nothing found'."\r\n";
+			//echo 'nothing found'."\r\n";
 			return;
 		}
 		$results = $results->to('array');
