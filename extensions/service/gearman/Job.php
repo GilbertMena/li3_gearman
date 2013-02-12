@@ -30,7 +30,7 @@ abstract class Job extends \lithium\core\Object {
 					$className = get_class($result);
 					$className = str_replace('\\','/',$className);
 					$response = array('className'=>LITHIUM_APP_PATH.substr($className,3),'object'=>serialize($result));
-					$order->sendComplete(serialize($response));
+					$order->sendComplete(base64_encode(serialize($response)));
 				}else
 				{
 					$order->sendComplete(json_encode($result));
@@ -49,7 +49,7 @@ abstract class Job extends \lithium\core\Object {
 		if(preg_match('/(?P<id>\d+)\|\|\|(?P<object>.*)/',$this->order->workload(),$matches))
 		{
 			$id = $matches['id'];
-			$object = unserialize($matches['object']);
+			$object = unserialize(base64_decode($matches['object']));
 			$object->id = $id;
 			return $object;
 		}
