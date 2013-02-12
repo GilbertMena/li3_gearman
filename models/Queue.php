@@ -83,19 +83,12 @@ class Queue extends \li3_gearman\models\Jobs {
 			return;
 		}
 		$results = $results->to('array');
-		echo $results['request_object'][65];
-		print_r($results);
-		$test = unserialize(base64_decode($results['request_object']));
-		print_r($test);
-		exit;
-		//foreach($results as $key => $result)
-		//{
-			$tempResult = $results;
-			unset($tempResult['id']);
-			$newInsert = Queue::create($tempResult);
-			$newInsert->save();
-			Queue::remove(array('id'=>$results['id']));
-		//}
+
+		$tempResult = $results;
+		unset($tempResult['id']);
+		$newInsert = Queue::create($tempResult);
+		$newInsert->save();
+		Queue::remove(array('id'=>$results['id']));
 	}
   }
   
