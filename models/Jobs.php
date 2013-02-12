@@ -112,7 +112,7 @@ class Jobs extends \lithium\data\Model {
    * @throws ErrorException
    */
   public static function deserialize($source) {
-    $handler = unserialize($source);
+    $handler = unserialize(base64_decode($source));
     //$handler = json_decode($source);
     if(method_exists($handler, 'perform')) {
       return $handler;
@@ -134,7 +134,7 @@ class Jobs extends \lithium\data\Model {
     
     $data = array(
       'attempts' => 0, 
-      'handler' => serialize($object),
+      'handler' => base64_encode(serialize($object)),
       //'handler' => json_encode($object),
       'priority' => $priority, 
       //'run_at' => $runAt, 
