@@ -35,7 +35,7 @@ class Queue extends \li3_gearman\models\Jobs {
     $data = array(
       'originating_system_id' => $object->_originatingSystemID,
 	  'originating_action_id' => $object->_originatingActionID, 
-      'request_object' => serialize($object),
+      'request_object' => base64_encode(serialize($object)),
       
     );
 	if(!method_exists($object, 'perform')) {
@@ -46,8 +46,57 @@ class Queue extends \li3_gearman\models\Jobs {
     $job = Queue::create($data);
     
     
-    
-    return $job->save();
+    $return = $job->save();
+	//var_dump($return); exit;
+    return $return;
+  }
+  
+  public static function reprocess($id=0)
+  {
+	if(empty($id))
+	{
+		echo 'processing all non task created records...'."\r\n";
+		$results = Queue::all(array('conditions'=>array('task_list_created'=>false)));
+		if(empty($results))
+		{
+			echo 'nothing found'."\r\n";
+			return;
+		}
+		$results = $results->to('array');
+		echo 'About to re-process '.count($results).' objects'."\r\n";
+		foreach($results as $key => $result)
+		{
+			$tempResult = $result;
+			unset($tempResult['id']);
+			$newInsert = Queue::create($tempResult);
+			$newInsert->save();
+			Queue::remove(array('id'=>$result['id']));
+		}
+		return;
+	}else
+	{
+		echo 'about to process queue id: '.$id."\r\n";
+		$results = Queue::first(array('conditions'=>array('id'=>$id)));
+		if(empty($results))
+		{
+			echo 'nothing found'."\r\n";
+			return;
+		}
+		$results = $results->to('array');
+		echo $results['request_object'][65];
+		print_r($results);
+		$test = unserialize(base64_decode($results['request_object']));
+		print_r($test);
+		exit;
+		//foreach($results as $key => $result)
+		//{
+			$tempResult = $results;
+			unset($tempResult['id']);
+			$newInsert = Queue::create($tempResult);
+			$newInsert->save();
+			Queue::remove(array('id'=>$results['id']));
+		//}
+	}
   }
   
   public static function runWithLock($job,$maxRunTime, $workerName = null) {
@@ -56,6 +105,7 @@ class Queue extends \li3_gearman\models\Jobs {
 
     try {
       $time_start = microtime(true);
+	  //print_r($job); exit;
       $result = $job->perform();
       $idKey = static::$keyID;
 	  $time_now = date('Y-m-d H:i:s');
