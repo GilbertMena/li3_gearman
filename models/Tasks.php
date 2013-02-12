@@ -25,7 +25,11 @@ class Tasks extends \li3_gearman\models\Jobs {
 
     try {
       $time_start = microtime(true);
-      $result = $job->perform();
+      $result = $job->pushObject();
+	  
+	  //here we must check the result from the perform method and update the table accordingly
+	  //var_dump($result); exit;
+	  
       $idKey = static::$keyID;
 	  $time_now = date('Y-m-d H:i:s');
       if(static::$storeObject)
