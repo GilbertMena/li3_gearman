@@ -102,15 +102,13 @@ class Queue extends \li3_gearman\models\Jobs {
       $result = $job->perform();
       $idKey = static::$keyID;
 	  $time_now = date('Y-m-d H:i:s');
+	  $auxiliaryData = base64_encode(serialize($job->auxiliaryData));
       if(static::$storeObject)
       {
-        
-
-        
-        $complete = static::update(array('task_list_date' => $time_now,'task_list_created'=>true), array($idKey => $job->id));
+        $complete = static::update(array('task_list_date' => $time_now,'task_list_created'=>true,'auxiliary_data'=>$auxiliaryData), array($idKey => $job->id));
       }else
       {
-		$complete = static::update(array('task_list_date' => $time_now,'task_list_created'=>true), array($idKey => $job->id));
+		$complete = static::update(array('task_list_date' => $time_now,'task_list_created'=>true,'auxiliary_data'=>$auxiliaryData), array($idKey => $job->id));
         static::remove(array($idKey => $job->id));
       }
       
